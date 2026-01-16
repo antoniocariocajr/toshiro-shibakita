@@ -1,0 +1,13 @@
+FROM php:7.4-apache
+
+# Instala as extensões necessárias para o MySQL
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Habilita o mod_rewrite do Apache (opcional, mas recomendado)
+RUN a2enmod rewrite
+
+# Copia o código da aplicação
+COPY index.php /var/www/html/
+
+# Define as permissões corretas
+RUN chown -R www-data:www-data /var/www/html

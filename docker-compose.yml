@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Banco de Dados
+  db:
+    image: mysql:5.7
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: Senha123
+      MYSQL_DATABASE: meubanco
+    volumes:
+      - ./db/banco.sql:/docker-entrypoint-initdb.d/banco.sql
+    networks:
+      - backend-network
+
+  # Aplicação PHP (Escalável)
+  app:
+    build:
+      context: ./app
+      dockerfile: dockerfile
+    environment:
+      DB_HOST: db
+      DB_NAME: meubanco
+      DB_USER: root
+      DB_PASSWORD: Senha123
+    depends_on:
+      - db
+    networks:
+      - backend-network
+
+  # Balanceador de Carga Nginx
+  nginx:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "4500:4500"
+    depends_on:
+      - app
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
